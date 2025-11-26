@@ -15,7 +15,8 @@ CSV_FILE = "climate_impact_report.csv"
 
 summary_text = None
 if os.path.exists(SUMMARY_FILE):
-    with open(SUMMARY_FILE, "r") as f:
+    with open(SUMMARY_FILE, "r", encoding="utf-8") as f:
+        
         summary_text = f.read()
 
 df = None
