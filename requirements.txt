@@ -1,7 +1,8 @@
 streamlit
+geopandas
+rasterio
+leafmap
+rioxarray
 pandas
 numpy
 matplotlib
-geopandas
-rasterio
-pyogrio
