@@ -97,13 +97,16 @@ else:
 with tab_map:
     import leafmap.foliumap as leafmap
 
-    st.subheader("Deforestation Risk Map")
+    st.subheader("Global Forest Loss (Hansen 2001-2023)")
 
-    m = leafmap.Map(center=[11.1271, 78.6569], zoom=6)
+    m = leafmap.Map(center=[11.1271, 78.6569], zoom=7)
 
-    m.add_raster(
-        "Hansen_GFC-2024-v1.12_lossyear_20N_070E.tif",
-        layer_name="Tree Loss Year",
+    # Add Hansen Global Forest Change tile layer
+    m.add_basemap("OpenStreetMap")
+    m.add_tile_layer(
+        url="https://earthengine.googleapis.com/map/520bdaa1f76afab902ecc053a583151b/{z}/{x}/{y}?token=0790e7a11069a6e78373f3e3d6cfb779",
+        name="Forest Loss",
+        attribution="Hansen/UMD/Google/USGS/NASA"
     )
 
     m.add_layer_control()
