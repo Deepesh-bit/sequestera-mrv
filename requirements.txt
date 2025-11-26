@@ -6,3 +6,4 @@ rioxarray
 pandas
 numpy
 matplotlib
+localtileserver
