@@ -30,17 +30,49 @@ else:
     )
 
     with tab_overview:
-        st.subheader("Project Summary (Auto-Generated)")
+        with tab_overview:
+         st.subheader("Project Summary")
 
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Total Forest Lost (ha)", f"{total_forest_loss:,.2f}")
-        col2.metric("Total CO₂e Emitted (tCO₂e)", f"{total_co2_loss:,.2f}")
-        col3.metric("Worst Year (tCO₂e)", f"{worst_year} ({worst_year_co2:,.2f})")
+    col1, col2 = st.columns([1, 2])
 
-        st.write("""
-        The Sequestera MRV engine analyzes deforestation and estimates carbon emissions to verify climate impact.
-        Confidence scoring and satellite validation modules are coming soon.
-        """)
+    # Read Sequestera Confidence Score
+    try:
+        with open("score.txt", "r") as f:
+            scs = float(f.read().strip())
+    except:
+        scs = None
+
+    if scs is not None:
+        if scs >= 70:
+            color = "green"
+            rating = "High Confidence"
+        elif scs >= 50:
+            color = "orange"
+            rating = "Moderate Confidence"
+        else:
+            color = "red"
+            rating = "Low Confidence"
+
+        col1.markdown(f"""
+        <div style="padding:20px; border-radius:15px; background-color:{color}; color:white; text-align:center;">
+            <h2>Sequestera Confidence Score</h2>
+            <h1>{scs:.2f} / 100</h1>
+            <p>{rating}</p>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        col1.error("No score data available.")
+
+    total_forest_loss = df["Forest Loss (ha)"].sum()
+    total_co2_loss = df["CO2e Lost (tCO2e)"].sum()
+    worst_row = df.loc[df["CO2e Lost (tCO2e)"].idxmax()]
+    worst_year = int(worst_row["Year"])
+    worst_year_co2 = worst_row["CO2e Lost (tCO2e)"]
+
+    col2.metric("Total Forest Lost (ha)", f"{total_forest_loss:,.2f}")
+    col2.metric("Total CO₂e Emitted (tCO₂e)", f"{total_co2_loss:,.2f}")
+    col2.metric("Worst Year", worst_year)
+
 
     with tab_forest:
         st.subheader("Annual Forest Loss (ha)")

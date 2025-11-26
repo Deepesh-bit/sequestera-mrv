@@ -136,6 +136,11 @@ def main():
         with open("summary_report.txt", "a") as f:
             f.write("\nSequestera Confidence Score\n")
             f.write(f"{total_score:.2f} / 100\n")
+            
+                    # Save score separately for dashboard
+        with open("score.txt", "w") as f:
+            f.write(f"{total_score:.2f}")
+
 
 
 
