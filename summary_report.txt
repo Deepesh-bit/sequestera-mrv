@@ -1,0 +1,12 @@
+SEQUESTERA MRV – Climate Impact Summary
+--------------------------------------
+Project area (approx): 2323767.57 ha
+Forest area baseline: 541279.95 ha (23.29% cover)
+
+Total forest lost (2001–2023): 13664.20 ha
+Total carbon lost: 770660.64 tC
+Total CO2e emitted: 2825755.70 tCO2e
+Worst year: 2023 with 606750.09 tCO2e emitted
+
+Sequestera Confidence Score
+55.11 / 100
