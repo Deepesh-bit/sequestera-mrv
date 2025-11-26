@@ -25,9 +25,10 @@ else:
     worst_year = int(worst_row["Year"])
     worst_year_co2 = worst_row["CO2e Lost (tCO2e)"]
 
-    tab_overview, tab_forest, tab_carbon, tab_data = st.tabs(
-        ["🌍 Overview", "🌳 Forest Loss", "🔥 Carbon & CO₂", "📄 Raw Data"]
-    )
+    tab_overview, tab_forest, tab_carbon, tab_map, tab_data = st.tabs(
+    ["🌍 Overview", "🌳 Forest Loss", "🔥 Carbon & CO₂", "🗺 Map", "📄 Raw Data"]
+)
+
 
     with tab_overview:
         with tab_overview:
@@ -93,3 +94,17 @@ else:
     with tab_data:
         st.subheader("Underlying Climate Impact Data")
         st.dataframe(df, use_container_width=True)
+with tab_map:
+    import leafmap.foliumap as leafmap
+
+    st.subheader("Deforestation Risk Map")
+
+    m = leafmap.Map(center=[11.1271, 78.6569], zoom=6)
+
+    m.add_raster(
+        "Hansen_GFC-2024-v1.12_lossyear_20N_070E.tif",
+        layer_name="Tree Loss Year",
+    )
+
+    m.add_layer_control()
+    m.to_streamlit()
