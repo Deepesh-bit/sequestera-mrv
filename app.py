@@ -146,9 +146,11 @@ with tab_map:
 
     # Add Satellite Basemap
     folium.TileLayer(
-        tiles="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
-        name="Topographic Map"
-    ).add_to(m)
+    tiles="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+    name="Topographic Map",
+    attr="© OpenTopoMap contributors"
+).add_to(m)
+
 
     # Add ESA Land Cover WMS
     folium.raster_layers.WmsTileLayer(
