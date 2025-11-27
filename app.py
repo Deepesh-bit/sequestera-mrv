@@ -96,18 +96,24 @@ else:
         st.dataframe(df, use_container_width=True)
 with tab_map:
     import leafmap.foliumap as leafmap
+    import geopandas as gpd
 
-    st.subheader("Global Forest Loss (Hansen 2001-2023)")
+    st.subheader("Sequestera Project MRV Map")
 
     m = leafmap.Map(center=[11.1271, 78.6569], zoom=7)
 
-    # Add Hansen Global Forest Change tile layer
-    m.add_basemap("OpenStreetMap")
+    # Add global Hansen forest loss
+    m.add_basemap("Satellite")
     m.add_tile_layer(
         url="https://earthengine.googleapis.com/map/520bdaa1f76afab902ecc053a583151b/{z}/{x}/{y}?token=0790e7a11069a6e78373f3e3d6cfb779",
         name="Forest Loss",
         attribution="Hansen/UMD/Google/USGS/NASA"
     )
 
+    # Add project boundary
+    gdf = gpd.read_file("project_area.geojson")
+    m.add_gdf(gdf, layer_name="Project Boundary", zoom_to_layer=True)
+
     m.add_layer_control()
     m.to_streamlit()
+
