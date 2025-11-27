@@ -135,31 +135,42 @@ with tab_map:
     import leafmap.foliumap as leafmap
     import geopandas as gpd
 
-    st.subheader("Sequestera Project MRV Map")
+    st.subheader("Sequestera MRV Map")
 
+    # Create base map centered on Tamil Nadu
     m = leafmap.Map(center=[11.1271, 78.6569], zoom=7)
 
-    # Add global Hansen forest loss
-    m.add_basemap("Satellite")
+    # 🌍 Add ESA Land Cover dataset
+    m.add_tile_layer(
+        url="https://services.sentinel-hub.com/ogc/wms/0312b59b-e5bb-4cff-8bda-d5e63d12f9a0?SERVICE=WMS&REQUEST=GetMap&SHOWLOGO=false&VERSION=1.3.0&LAYERS=LULC_SENTINEL2&FORMAT=image/png&CRS=EPSG:3857",
+        name="Land Cover (ESA)",
+        attribution="ESA WorldCover"
+    )
+
+    # 🔥 Add Hansen Global Forest Loss dataset
     m.add_tile_layer(
         url="https://earthengine.googleapis.com/map/520bdaa1f76afab902ecc053a583151b/{z}/{x}/{y}?token=0790e7a11069a6e78373f3e3d6cfb779",
-        name="Forest Loss",
+        name="Forest Loss (Hansen)",
         attribution="Hansen/UMD/Google/USGS/NASA"
     )
 
-    # Add project boundary
+    # 🌳 Add NASA Above-Ground Biomass (Carbon Stock)
+    m.add_tile_layer(
+        url="https://earthengine.googleapis.com/map/47c8b05ffe7e3ffa9c3e5b7191e42f4a/{z}/{x}/{y}?token=089a0ae549e0cb553ecf41e37b16167b",
+        name="Carbon Biomass (AGB)",
+        attribution="NASA / GEDI / Baccini"
+    )
+
+    # ➕ Add your Project Boundary
     gdf = gpd.read_file("project_area.geojson")
     m.add_gdf(
-    gdf,
-    layer_name="Project Boundary",
-    zoom_to_layer=True,
-    style={
-        "color": "#8E44AD",  # Sequestera Purple
-        "weight": 3,  # Thicker boundary
-        "fillOpacity": 0.1,  # Light transparent fill
-    }
-)
+        gdf,
+        layer_name="Project Boundary",
+        zoom_to_layer=True,
+        style={"color": "#8E44AD", "weight": 3, "fillOpacity": 0.1}
+    )
 
+    # 🧭 Layer control
     m.add_layer_control()
     m.to_streamlit()
 
