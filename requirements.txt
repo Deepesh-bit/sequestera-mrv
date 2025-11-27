@@ -10,3 +10,4 @@ rioxarray
 Fiona
 pyproj
 Shapely
+streamlit-folium
