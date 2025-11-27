@@ -138,7 +138,16 @@ with tab_map:
     st.subheader("Sequestera MRV Map")
 
     # Create base map centered on Tamil Nadu
-    m = leafmap.Map(center=[11.1271, 78.6569], zoom=7)
+    m = leafmap.Map(
+    center=[11.1271, 78.6569],
+    zoom=7,
+    draw_control=False,
+    measure_control=True,
+    fullscreen_control=True,
+    layers_control=True,
+    basemap="SATELLITE"
+)
+
 
     # 🌍 Add ESA Land Cover dataset
     m.add_tile_layer(
