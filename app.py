@@ -185,4 +185,23 @@ with tab_map:
     folium.LayerControl().add_to(m)
 
     # Render map
-    st_folium(m, width=1000, height=600)
+    st_data = st_folium(m, width=1000, height=600)
+
+# ---- Pixel Analysis on Click ----
+if st_data and st_data.get("last_clicked"):
+    lat = st_data["last_clicked"]["lat"]
+    lon = st_data["last_clicked"]["lng"]
+
+    # Display clicked location
+    st.success(f"📍 Clicked: {lat:.4f}, {lon:.4f}")
+
+    st.write("🔍 Analyzing satellite data... (this may take a few seconds)")
+
+    # Here we will add:
+    # - Landcover API fetch
+    # - Biomass API fetch
+    # - Forest loss year fetch
+    # - Carbon estimation logic
+
+    st.info("MRV Pixel Intelligence Coming Next ➜ 🚀")
+
