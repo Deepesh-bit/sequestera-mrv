@@ -192,63 +192,34 @@ if st_data and st_data.get("last_clicked"):
     lat = st_data["last_clicked"]["lat"]
     lon = st_data["last_clicked"]["lng"]
 
-    # Display clicked location
     st.success(f"📍 Clicked: {lat:.4f}, {lon:.4f}")
+    st.subheader("🌎 MRV Pixel Intelligence")
 
-    st.write("🔍 Analyzing satellite data... (this may take a few seconds)")
-
-    # Here we will add:
-    # - Landcover API fetch
-    # - Biomass API fetch
-    # - Forest loss year fetch
-    # - Carbon estimation logic
-
-    import requests
-
-# Helper function for WMS GetFeatureInfo
-def get_pixel_value(lat, lon, url, layers):
-    delta = 0.0005  # small bounding box around click
-    bbox = f"{lon-delta},{lat-delta},{lon+delta},{lat+delta}"
-
-    wms_url = (
-        f"{url}"
-        f"?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo"
-        f"&CRS=EPSG:4326&INFO_FORMAT=application/json"
-        f"&LAYERS={layers}&QUERY_LAYERS={layers}"
-        f"&WIDTH=10&HEIGHT=10"
-        f"&I=5&J=5"
-        f"&BBOX={bbox}"
-    )
-
-    r = requests.get(wms_url)
     try:
-        return r.json()
-    except:
-        return None
+        import rasterio
 
+        # Load local landcover raster
+        with rasterio.open("ESA_landcover.tif") as src:
+            x, y = src.index(lon, lat)
+            lc_code = src.read(1)[y, x]
 
-# Landcover info
-st.subheader("🌎 MRV Pixel Intelligence")
+        landcover_names = {
+            10: "Tree Cover",
+            20: "Shrubland",
+            30: "Grassland",
+            40: "Cropland",
+            50: "Built Area",
+            60: "Bare Land",
+            70: "Snow & Ice",
+            80: "Water",
+            90: "Herbaceous Wetland",
+            95: "Mangroves"
+        }
 
-st.write("🟩 Landcover:")
-try:
-    lc_url = f"https://api.opentopodata.org/v1/test-dataset?locations={lat},{lon}"
-    lc_res = requests.get(lc_url).json()
+        lc_label = landcover_names.get(lc_code, f"Unknown ({lc_code})")
+        st.write("🟩 Landcover:", lc_label)
 
-    # Fake landcover decoder for now – to confirm pipeline works
-    st.success("🌳 Tree Cover (placeholder test)")
-except:
-    st.error("Landcover service error")
-
-
-# Show Landcover
-if lc_data:
-    try:
-        code = int(lc_data["features"][0]["properties"]["VALUE"])
-        st.write("🟩 Landcover:", landcover_class.get(code, f"Unknown ({code})"))
-    except:
-        st.write("🌐 Landcover: Not Available")
-else:
-    st.write("🌐 Landcover: No Data")
+    except Exception as e:
+        st.error(f"Landcover Read Error: {str(e)}")
 
 
