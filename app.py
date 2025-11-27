@@ -228,26 +228,18 @@ def get_pixel_value(lat, lon, url, layers):
 
 
 # Landcover info
-lc_data = get_pixel_value(
-    lat,
-    lon,
-    "https://services.sentinel-hub.com/ogc/wms/0312b59b-e5bb-4cff-8bda-d5e63d12f9a0",
-    "LULC_SENTINEL2"
-)
-
-# Simplified class lookup (expand soon)
-landcover_class = {
-    10: "Tree Cover",
-    20: "Shrubland",
-    30: "Grassland",
-    40: "Cropland",
-    50: "Built Area",
-    60: "Bare Land",
-    70: "Snow/Ice",
-    80: "Water"
-}
-
 st.subheader("🌎 MRV Pixel Intelligence")
+
+st.write("🟩 Landcover:")
+try:
+    lc_url = f"https://api.opentopodata.org/v1/test-dataset?locations={lat},{lon}"
+    lc_res = requests.get(lc_url).json()
+
+    # Fake landcover decoder for now – to confirm pipeline works
+    st.success("🌳 Tree Cover (placeholder test)")
+except:
+    st.error("Landcover service error")
+
 
 # Show Landcover
 if lc_data:
