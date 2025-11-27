@@ -203,5 +203,54 @@ if st_data and st_data.get("last_clicked"):
     # - Forest loss year fetch
     # - Carbon estimation logic
 
-    st.info("MRV Pixel Intelligence Coming Next ➜ 🚀")
+    import requests
+
+# Helper function for WMS GetFeatureInfo
+def get_pixel_value(lat, lon, url, layers):
+    wms_url = (
+        f"{url}"
+        f"?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo"
+        f"&CRS=EPSG:4326&INFO_FORMAT=application/json"
+        f"&I=0&J=0&WIDTH=1&HEIGHT=1"
+        f"&LAYERS={layers}&QUERY_LAYERS={layers}"
+        f"&BBOX={lon},{lat},{lon},{lat}"
+    )
+    r = requests.get(wms_url)
+    try:
+        return r.json()
+    except:
+        return None
+
+# Landcover info
+lc_data = get_pixel_value(
+    lat,
+    lon,
+    "https://services.sentinel-hub.com/ogc/wms/0312b59b-e5bb-4cff-8bda-d5e63d12f9a0",
+    "LULC_SENTINEL2"
+)
+
+# Simplified class lookup (expand soon)
+landcover_class = {
+    10: "Tree Cover",
+    20: "Shrubland",
+    30: "Grassland",
+    40: "Cropland",
+    50: "Built Area",
+    60: "Bare Land",
+    70: "Snow/Ice",
+    80: "Water"
+}
+
+st.subheader("🌎 MRV Pixel Intelligence")
+
+# Show Landcover
+if lc_data:
+    try:
+        code = int(lc_data["features"][0]["properties"]["VALUE"])
+        st.write("🟩 Landcover:", landcover_class.get(code, f"Unknown ({code})"))
+    except:
+        st.write("🌐 Landcover: Not Available")
+else:
+    st.write("🌐 Landcover: No Data")
+
 
