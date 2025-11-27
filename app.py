@@ -112,7 +112,16 @@ with tab_map:
 
     # Add project boundary
     gdf = gpd.read_file("project_area.geojson")
-    m.add_gdf(gdf, layer_name="Project Boundary", zoom_to_layer=True)
+    m.add_gdf(
+    gdf,
+    layer_name="Project Boundary",
+    zoom_to_layer=True,
+    style={
+        "color": "#8E44AD",  # Sequestera Purple
+        "weight": 3,  # Thicker boundary
+        "fillOpacity": 0.1,  # Light transparent fill
+    }
+)
 
     m.add_layer_control()
     m.to_streamlit()
