@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 
+
 st.set_page_config(
     page_title="Sequestera MRV Dashboard",
     layout="wide"
@@ -24,6 +25,42 @@ else:
     worst_row = df.loc[df["CO2e Lost (tCO2e)"].idxmax()]
     worst_year = int(worst_row["Year"])
     worst_year_co2 = worst_row["CO2e Lost (tCO2e)"]
+
+        # ---- SUMMARY METRICS FOR SIDEBAR ----
+    total_forest_loss = df["Forest Loss (ha)"].sum()
+    total_co2_loss = df["CO2e Lost (tCO2e)"].sum()
+    total_carbon_loss = df["Carbon Lost (tC)"].sum()
+
+    worst_row = df.loc[df["CO2e Lost (tCO2e)"].idxmax()]
+    worst_year = int(worst_row["Year"])
+    worst_year_co2 = worst_row["CO2e Lost (tCO2e)"]
+
+    # Read Sequestera Confidence Score if available
+    scs = None
+    try:
+        with open("score.txt", "r") as f:
+            scs = float(f.read().strip())
+    except:
+        scs = None
+
+            # ---- SIDEBAR INSIGHTS ----
+    with st.sidebar:
+        st.title("Sequestera Insights")
+
+        st.subheader("Deforestation Impact")
+        st.metric("Total Forest Loss (ha)", f"{total_forest_loss:,.2f}")
+        st.metric("Total CO₂e Emitted (tCO₂e)", f"{total_co2_loss:,.2f}")
+
+        st.subheader("Worst Year")
+        st.metric("Year", worst_year, help=f"{worst_year_co2:,.2f} tCO₂e emitted")
+
+        if scs is not None:
+            st.subheader("Confidence Score")
+            st.metric("Sequestera Score", f"{scs:.2f} / 100")
+        else:
+            st.info("Run baseline_forest.py to generate the Sequestera Confidence Score.")
+
+
 
     tab_overview, tab_forest, tab_carbon, tab_map, tab_data = st.tabs(
     ["🌍 Overview", "🌳 Forest Loss", "🔥 Carbon & CO₂", "🗺 Map", "📄 Raw Data"]
