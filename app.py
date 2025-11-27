@@ -132,54 +132,55 @@ else:
         st.subheader("Underlying Climate Impact Data")
         st.dataframe(df, use_container_width=True)
 with tab_map:
-    import leafmap.foliumap as leafmap
+    import folium
     import geopandas as gpd
+    from streamlit_folium import st_folium
 
     st.subheader("Sequestera MRV Map")
 
-    # Create base map centered on Tamil Nadu
-    m = leafmap.Map(
-    center=[11.1271, 78.6569],
-    zoom=7,
-    draw_control=False,
-    measure_control=True,
-    fullscreen_control=True,
-    layers_control=True,
-    basemap="SATELLITE"
-)
-
-
-    # 🌍 Add ESA Land Cover dataset
-    m.add_tile_layer(
-        url="https://services.sentinel-hub.com/ogc/wms/0312b59b-e5bb-4cff-8bda-d5e63d12f9a0?SERVICE=WMS&REQUEST=GetMap&SHOWLOGO=false&VERSION=1.3.0&LAYERS=LULC_SENTINEL2&FORMAT=image/png&CRS=EPSG:3857",
-        name="Land Cover (ESA)",
-        attribution="ESA WorldCover"
-    )
-
-    # 🔥 Add Hansen Global Forest Loss dataset
-    m.add_tile_layer(
-        url="https://earthengine.googleapis.com/map/520bdaa1f76afab902ecc053a583151b/{z}/{x}/{y}?token=0790e7a11069a6e78373f3e3d6cfb779",
-        name="Forest Loss (Hansen)",
-        attribution="Hansen/UMD/Google/USGS/NASA"
-    )
-
-    # 🌳 Add NASA Above-Ground Biomass (Carbon Stock)
-    m.add_tile_layer(
-        url="https://earthengine.googleapis.com/map/47c8b05ffe7e3ffa9c3e5b7191e42f4a/{z}/{x}/{y}?token=089a0ae549e0cb553ecf41e37b16167b",
-        name="Carbon Biomass (AGB)",
-        attribution="NASA / GEDI / Baccini"
-    )
-
-    # ➕ Add your Project Boundary
+    # Load Project Boundary
     gdf = gpd.read_file("project_area.geojson")
-    m.add_gdf(
+
+    # Create Map centered on Tamil Nadu
+    m = folium.Map(location=[11.1271, 78.6569], zoom_start=7)
+
+    # Add Satellite Basemap
+    folium.TileLayer(
+        tiles="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+        name="Topographic Map"
+    ).add_to(m)
+
+    # Add ESA Land Cover WMS
+    folium.raster_layers.WmsTileLayer(
+        url="https://services.sentinel-hub.com/ogc/wms/0312b59b-e5bb-4cff-8bda-d5e63d12f9a0",
+        layers="LULC_SENTINEL2",
+        fmt="image/png",
+        transparent=True,
+        name="Land Cover (ESA)"
+    ).add_to(m)
+
+    # Add Forest Loss WMS
+    folium.raster_layers.WmsTileLayer(
+        url="https://global-forest-watch-raster.s3.amazonaws.com/forest_loss_year_wms",
+        layers="forest_loss_year",
+        fmt="image/png",
+        transparent=True,
+        name="Forest Loss (Hansen)"
+    ).add_to(m)
+
+    # Add Project Boundary layer
+    folium.GeoJson(
         gdf,
-        layer_name="Project Boundary",
-        zoom_to_layer=True,
-        style={"color": "#8E44AD", "weight": 3, "fillOpacity": 0.1}
-    )
+        name="Project Boundary",
+        style_function=lambda x: {
+            "fillOpacity": 0.1,
+            "color": "#8E44AD",
+            "weight": 3
+        }
+    ).add_to(m)
 
-    # 🧭 Layer control
-    m.add_layer_control()
-    m.to_streamlit()
+    # Enable Layer Control
+    folium.LayerControl().add_to(m)
 
+    # Render map
+    st_folium(m, width=1000, height=600)
