@@ -192,34 +192,35 @@ if st_data and st_data.get("last_clicked"):
     lat = st_data["last_clicked"]["lat"]
     lon = st_data["last_clicked"]["lng"]
 
-    st.success(f"📍 Clicked: {lat:.4f}, {lon:.4f}")
+    st.success(f"📍 Clicked Point: {lat:.4f}, {lon:.4f}")
     st.subheader("🌎 MRV Pixel Intelligence")
 
-    try:
-        import rasterio
+    import requests
 
-        # Load local landcover raster
-        with rasterio.open("ESA_landcover.tif") as src:
-            x, y = src.index(lon, lat)
-            lc_code = src.read(1)[y, x]
+    query = f"""
+    [out:json];
+    (
+      way(around:20,{lat},{lon})["landuse"];
+      way(around:20,{lat},{lon})["natural"];
+      way(around:20,{lat},{lon})["building"];
+    );
+    out tags;
+    """
 
-        landcover_names = {
-            10: "Tree Cover",
-            20: "Shrubland",
-            30: "Grassland",
-            40: "Cropland",
-            50: "Built Area",
-            60: "Bare Land",
-            70: "Snow & Ice",
-            80: "Water",
-            90: "Herbaceous Wetland",
-            95: "Mangroves"
-        }
+    response = requests.get(
+        "https://overpass-api.de/api/interpreter",
+        params={"data": query}
+    )
 
-        lc_label = landcover_names.get(lc_code, f"Unknown ({lc_code})")
-        st.write("🟩 Landcover:", lc_label)
-
-    except Exception as e:
-        st.error(f"Landcover Read Error: {str(e)}")
+    if response.status_code == 200:
+        data = response.json()
+        if len(data["elements"]) > 0:
+            tags = data["elements"][0]["tags"]
+            land_type = tags.get("landuse") or tags.get("natural") or tags.get("building")
+            st.write("🟩 Landcover:", land_type.capitalize())
+        else:
+            st.write("🌐 No OSM landcover found here")
+    else:
+        st.error("OSM service error")
 
 
